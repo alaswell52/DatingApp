@@ -1,0 +1,4 @@
+/* Turns the pointer into a hand cursor when interacting with the dropdown menu*/
+.dropdown-toggle, .dropdown-item{
+    cursor: pointer;
+}
