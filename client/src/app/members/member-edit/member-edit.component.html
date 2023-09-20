@@ -82,7 +82,10 @@
             </tab>
 
             <tab heading="Edit Photos">
-                <p>Photo edit will go here </p>                
+                <!-- pass the parent (Member-edit-component) to child component (photo-editor-component) [member] ie @Input Member -->
+                <app-photo-editor [member]="member">
+
+                </app-photo-editor>                
             </tab>
 
         </tabset>

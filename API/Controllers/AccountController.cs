@@ -1,11 +1,13 @@
 
 
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using API.Controllers;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
 using API.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -18,11 +20,19 @@ using Microsoft.EntityFrameworkCore;
 public class AccountController : BaseApiController
 {
     private readonly DataContext _context;
+    private readonly IUserRepository _userRepository;
+    private readonly IPhotoService _photoService;
     private readonly ITokenService _tokenService;
 
-    public AccountController(DataContext context, ITokenService tokenService)
-    {
+
+    public AccountController(DataContext context,
+                            IUserRepository userRepository,
+                            IPhotoService photoService, 
+                            ITokenService tokenService)
+    {                    
         _context = context;
+        _userRepository = userRepository;
+        _photoService = photoService;
         _tokenService = tokenService;
     }
 
@@ -39,7 +49,6 @@ public class AccountController : BaseApiController
             UserName = registerDTO.UserName,
             PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password)),
             PasswordSalt = hmac.Key
-
         };
 
         _context.Users.Add(user);
@@ -49,7 +58,8 @@ public class AccountController : BaseApiController
         return new UserDTO
         {
             UserName = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
 
     }
@@ -57,8 +67,8 @@ public class AccountController : BaseApiController
     [HttpPost("login")] // api/account/login
     public async Task<ActionResult<UserDTO>> Login(LoginDTO loginDTO)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName.ToLower() == loginDTO.UserName.ToLower());
-
+        var user = await _userRepository.GetUserByUsernameAsync(loginDTO.UserName.ToLower());
+     
         if (user == null) return Unauthorized();
 
         using var hmac = new HMACSHA512(user.PasswordSalt);
@@ -71,9 +81,29 @@ public class AccountController : BaseApiController
         return new UserDTO
         {
             UserName = user.UserName,
-            Token = _tokenService.CreateToken(user)
+            Token = _tokenService.CreateToken(user),
+             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
 
+    }
+
+    [HttpDelete("delet-photo/{photoId}")]
+    public async Task<ActionResult> DeletePhoto(int photoId)
+    {
+        var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+        var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+        if(photo == null) return NotFound();
+
+        if(photo.IsMain) return BadRequest("You cannot delete your main photo");
+        if(photo.PublicId != null)
+        {
+            var result = await _photoService.DeletePhotoAsync(photo.PublicId);
+            if(result.Error != null) return BadRequest(result.Error.Message);
+        }
+        user.Photos.Remove(photo);
+        if(await _userRepository.SaveAllAsync()) return Ok();
+        
+        return BadRequest("Problem deleting photo");
     }
 
     private async Task<bool> UserExists(string userName)

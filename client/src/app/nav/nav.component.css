@@ -1,4 +1,11 @@
 /* Turns the pointer into a hand cursor when interacting with the dropdown menu*/
+
 .dropdown-toggle, .dropdown-item{
     cursor: pointer;
+}
+
+img {
+    max-height: 50px;
+    border: 2px solid white;
+    display: inline;
 }
