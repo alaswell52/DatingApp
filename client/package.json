@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "compodoc": "npx compodoc -p src/tsconfig.doc.json -s"
   },
   "private": true,
   "dependencies": {
@@ -19,6 +20,7 @@
     "@angular/platform-browser": "^16.2.0",
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "bootstrap": "^5.2.3",
     "bootswatch": "^5.3.1",
     "font-awesome": "^4.7.0",

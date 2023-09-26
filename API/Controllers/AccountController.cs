@@ -10,6 +10,7 @@ using API.Entities;
 using API.Extensions;
 using API.Interfaces;
 using API.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -23,43 +24,44 @@ public class AccountController : BaseApiController
     private readonly IUserRepository _userRepository;
     private readonly IPhotoService _photoService;
     private readonly ITokenService _tokenService;
-
+    private readonly IMapper _mapper;
 
     public AccountController(DataContext context,
                             IUserRepository userRepository,
                             IPhotoService photoService, 
-                            ITokenService tokenService)
+                            ITokenService tokenService,
+                            IMapper mapper)
     {                    
         _context = context;
         _userRepository = userRepository;
         _photoService = photoService;
         _tokenService = tokenService;
+        _mapper = mapper;
     }
 
     [HttpPost("register")] // api/account/register
     public async Task<ActionResult<UserDTO>> Register(RegisterDTO registerDTO)
     {
 
-        if(await UserExists(registerDTO.UserName))
-            return BadRequest("User name is taken.");
+        if(await UserExists(registerDTO.UserName)) return BadRequest("User name is taken.");
+
+        var user = _mapper.Map<AppUser>(registerDTO);
 
         using var hmac = new HMACSHA512(); // using will dispose the class automatically by calling the dispose() from IDisposable interface
-        var user = new AppUser
-        {
-            UserName = registerDTO.UserName,
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password)),
-            PasswordSalt = hmac.Key
-        };
+            
+        user.UserName = registerDTO.UserName;
+        user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDTO.Password));
+        user.PasswordSalt = hmac.Key;
 
-        _context.Users.Add(user);
-        
+        _context.Users.Add(user);        
         await _context.SaveChangesAsync();
         
         return new UserDTO
         {
             UserName = user.UserName,
             Token = _tokenService.CreateToken(user),
-            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+            KnownAs = user.KnownAs
+            //, PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
 
     }
@@ -82,7 +84,8 @@ public class AccountController : BaseApiController
         {
             UserName = user.UserName,
             Token = _tokenService.CreateToken(user),
-             PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+            KnownAs = user.KnownAs
         };
 
     }
