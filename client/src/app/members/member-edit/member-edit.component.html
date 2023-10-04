@@ -14,6 +14,7 @@
             <img src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}" 
             class="card-img-top img-thumbnail">
             <div class="card-body">
+
                 <div>
                     <strong>Location:</strong>
                     <p>{{member.city}}, {{member.country}}</p>
@@ -26,12 +27,13 @@
     
                 <div>
                     <strong>Last Active:</strong>
-                    <p>{{member.lastActive}}</p>
+                    <p>{{member.lastActive + 'Z' | timeago}}</p>
                 </div>
-    
+    <!-- + 'Z' to convert to UTC format -->
+    <!-- date: 'dd MMM yyyy' -->
                 <div>
                     <strong>Member since:</strong>
-                    <p>{{member.created}} </p>
+                    <p>{{member.created | date: 'shortDate'}} </p>
                 </div>
             </div>
                 <!-- form="editForm" specifies the form that this element is associated with -->

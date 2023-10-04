@@ -18,7 +18,7 @@ export class HomeComponent implements OnInit {
   constructor(private http: HttpClient, private memberService: MembersService) {}
 
   ngOnInit(): void {
-    this.memberService.getMembers();
+    //this.memberService.getMembers();
     //this.getUsers();
   }
 
