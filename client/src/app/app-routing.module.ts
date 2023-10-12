@@ -11,17 +11,18 @@ import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { preventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { memberDetailedResolver } from './_resolvers/member-detailed.resolver';
 
 const routes: Routes = [
   {path: '', component: HomeComponent},
 
   {path: '',
     runGuardsAndResolvers: 'always',
-  canActivate: [authGuard], // use auth.guard.ts to not allow page activation if not authorized
-  children: [
+    canActivate: [authGuard], // use auth.guard.ts to not allow page activation if not authorized
+    children: [
     // {path: 'members', component: MemberListComponent, canActivate: [authGuard]},
     {path: 'members', component: MemberListComponent},
-    {path: 'members/:username', component: MemberDetailComponent},
+    {path: 'members/:username', component: MemberDetailComponent, resolve: {member: memberDetailedResolver}},
     // uses the prevent-unsaved-changes-guard.ts to protect the user from unsaved changes
     {path: 'member/edit', component: MemberEditComponent, canDeactivate: [preventUnsavedChangesGuard]}, 
     {path: 'lists', component: ListsComponent},

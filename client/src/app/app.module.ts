@@ -28,6 +28,7 @@ import { TextInputComponent } from './forms/text-input/text-input.component';
 import { DatePickerComponent } from './_forms/date-picker/date-picker.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
 
 
 // FormsModule -> provides two way binding between and html template component to userform and userform to compoenent to allow user input 

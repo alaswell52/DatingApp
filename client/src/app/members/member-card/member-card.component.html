@@ -23,7 +23,10 @@
             </li>
             
             <li class="list-inline-item">
-                <button class="btn btn-primary">
+                <button 
+                    routerLink="/members/{{member.userName}}"
+                    [queryParams]="{tab: 'Messages'}"
+                    class="btn btn-primary">
                     <!-- fa = font-awesome -->
                     <i class="fa fa-envelope"></i>
                 </button>

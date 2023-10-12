@@ -8,6 +8,7 @@ import { UserParams } from '../_models/userParams';
 import { User } from '../_models/user';
 import { AccountService } from './account.service';
 import { Params } from '@angular/router';
+import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 @Injectable({
   providedIn: 'root'
@@ -59,55 +60,20 @@ export class MembersService implements OnInit{
     if(response) return of(response); // of is an observable
 
     console.log(Object.values(userParams).join('-'))
-    let params = this.getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
+    let params = getPaginationHeaders(userParams.pageNumber, userParams.pageSize);
 
     params = params.append('gender', userParams.gender);
     params = params.append('minAge', userParams.minAge);
     params = params.append('maxAge', userParams.maxAge);
     params = params.append('orderBy', userParams.orderBy);
 
-    return this.getPaginatedResult<Member[]>(this.baseUrl + 'users', params).pipe(
+    return getPaginatedResult<Member[]>(this.baseUrl + 'users', params, this.http).pipe(
       map(response => {
         this.memberCache.set(Object.values(userParams).join('-'), response);
         return response;
       })
     ); 
 
-  }
-
-  private getPaginatedResult<T>(url: string, params: HttpParams) {
-
-    const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>;
-
-    // this.http.get<Member[]>(this.baseUrl + 'users').pipe() will only access the data from body of the response
-    // the method below gets the data from the body and accesses the headers of the response to get full pagination ie the full http response
-    return this.http.get<T>(url, {observe: 'response', params}).pipe(
-      map(response => {
-
-        if(response.body) {
-          paginatedResult.result = response.body;
-        }
-
-        const pagination = response.headers.get('Pagination');
-
-        if(pagination){
-          paginatedResult.pagination = JSON.parse(pagination);
-        }
-
-        return paginatedResult;
-      })
-    )
-
-  }
-
-  private getPaginationHeaders(pageNumber: number, pageSize: number) {
-    let params = new HttpParams();
-
-    params = params.append('pageNumber', pageNumber);
-    params = params.append('pageSize', pageSize);
- 
-    
-    return params;
   }
 
   getMember(username: string) {
@@ -160,11 +126,10 @@ export class MembersService implements OnInit{
   getLikes(predicate: string, pageNumber: number, pageSize: number) {
 
 
-
-    let params = this.getPaginationHeaders(pageNumber, pageSize); 
+    let params = getPaginationHeaders(pageNumber, pageSize); 
     params = params.append('predicate', predicate);
 
-    return this.getPaginatedResult<Member[]>(this.baseUrl + 'likes', params); 
+    return getPaginatedResult<Member[]>(this.baseUrl + 'likes', params, this.http); 
     //this.http.get<Member[]>(this.baseUrl + 'likes?predicate=' + predicate);
   }
 
