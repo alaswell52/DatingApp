@@ -32,6 +32,7 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
+        // [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<PagedList<MemberDTO>>> GetUsers([FromQuery]UserParams userParams)
         {
@@ -58,6 +59,7 @@ namespace API.Controllers
         // public async Task<ActionResult<AppUser>> GetUser(int id) // /api/user/2
         //     => await _userRepository.GetUserByIdAsync(id); 
 
+        // [Authorize(Roles = "Member")]
         [HttpGet("{username}")] 
         public async Task<ActionResult<MemberDTO>> GetUser(string username) // /api/user/2
             => await _userRepository.GetMemberAsync(username);

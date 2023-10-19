@@ -1,10 +1,20 @@
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data;
 
 // DbContext is a combination of unit of work and Repository Patterns
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext<
+    AppUser, 
+    AppRole, 
+    int, 
+    IdentityUserClaim<int>, 
+    AppUserRole,
+    IdentityUserLogin<int>,
+    IdentityRoleClaim<int>,
+    IdentityUserToken<int>>
 {
 
     public DataContext(DbContextOptions options) : base(options)
@@ -12,13 +22,24 @@ public class DataContext : DbContext
 
     }
 
-    public DbSet<AppUser> Users { get; set; }
     public DbSet<UserLike> UserLikes { get; set; }
     public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AppUser>()
+            .HasMany(ur => ur.UserRoles )
+            .WithOne(u => u.User)
+            .HasForeignKey(ur => ur.UserId)
+            .IsRequired();
+
+        modelBuilder.Entity<AppRole>()
+            .HasMany(ur => ur.UserRoles )
+            .WithOne(u => u.Role)
+            .HasForeignKey(ur => ur.RoleId)
+            .IsRequired();            
 
         modelBuilder.Entity<UserLike>()
             .HasKey(k => new {k.SourceUserId, k.TargetUserId});

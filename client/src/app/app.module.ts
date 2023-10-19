@@ -29,6 +29,11 @@ import { DatePickerComponent } from './_forms/date-picker/date-picker.component'
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
+import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
+import { HasRollDirective } from './_directives/has-roll.directive';
+import { UserManagementComponent } from './admin/user-management/user-management.component';
+import { PhotoManagementComponent } from './admin/photo-management/photo-management.component';
+import { RolesModalComponent } from './modals/roles-modal/roles-modal.component';
 
 
 // FormsModule -> provides two way binding between and html template component to userform and userform to compoenent to allow user input 
@@ -50,7 +55,12 @@ import { MemberMessagesComponent } from './members/member-messages/member-messag
     MemberEditComponent,
     PhotoEditorComponent,
     TextInputComponent,
-    DatePickerComponent
+    DatePickerComponent,
+    AdminPanelComponent,
+    HasRollDirective,
+    UserManagementComponent,
+    PhotoManagementComponent,
+    RolesModalComponent
  
   ],
   imports: [

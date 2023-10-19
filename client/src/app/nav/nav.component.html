@@ -31,6 +31,10 @@
             <li class="nav-item">
               <a class="nav-link" routerLink="/errors" routerLinkActive="active">Errors</a>
             </li>
+            <!-- appHasRole is a custom directive -->
+            <li *appHasRoll="['Admin', 'Moderator']" class="nav-item" >
+              <a class="nav-link" routerLink="/admin" routerLinkActive="active">Admin</a>
+            </li>
 
 
             <!-- <li class="nav-item" (click)="logout()">
@@ -41,7 +45,7 @@
 
         <div class="dropdown" *ngIf="(accountService.currentUser$ | async) as user" dropdown>
           <img src="{{user.photoUrl || './assets/user.png'}}" alt="user photo">  
-          <a class="dropdown-toggle text-light text-decoration-none ms-1" dropdownToggle> Welcome {{user.knownAs | titlecase}}</a>
+          <a class="dropdown-toggle text-light text-decoration-none ms-1" dropdownToggle> Welcome {{user.username | titlecase}}</a>
             <div class="dropdown-menu" *dropdownMenu>
                 <li>
                     <a class="dropdown-item" routerLink="/member/edit">Edit Profile</a>
